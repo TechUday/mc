@@ -1,0 +1,716 @@
+import javax.microedition.lcdui.*;
+import javax.microedition.midlet.*; 
+import java.io.*;
+import java.lang.*;
+import javax.microedition.io.*;
+import javax.microedition.rms.*;
+public class changeFont extends MIDlet 
+{ 
+public static final boolean COLOR = false;
+public static final int WHITE = 0xFFFFFF;
+public static final int BLACK = 0x000000;
+public static final int LIGHT_GRAY = 0xAAAAAA;
+
+private Display myDisplay = null;
+private DecodeCanvas decodeCanvas = null;
+private boolean painting = false;
+
+ public changeFont() { 
+ myDisplay = Display.getDisplay(this);
+ decodeCanvas = new DecodeCanvas(this);
+ }
+ public void startApp() throws MIDletStateChangeException { 
+ myDisplay.setCurrent(decodeCanvas);
+ }
+ public void pauseApp() {
+ }
+ protected void destroyApp(boolean unconditional)
+ throws MIDletStateChangeException {
+ }
+ class DecodeCanvas extends Canvas {
+ private changeFont parent = null;
+ private int width = getWidth();
+ private int height = getHeight();
+ 
+ public DecodeCanvas(changeFont parent) {
+ this.parent = parent;
+ }
+ 
+ public void paint(Graphics g) {
+ g.setColor(WHITE); 
+ g.fillRect(0, 0, width, height);
+ 
+ 
+ Font f1 = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_LARGE); 
+ Font f2 = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM); 
+ Font f3 = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL); 
+ int yPos = 0;
+ g.setColor(LIGHT_GRAY); 
+ g.setColor(BLACK);
+
+ g.setFont(f1);
+ g.drawString("BIG FONT", 0, yPos, Graphics.LEFT | Graphics.TOP);
+ yPos = yPos + f1.getHeight() + 10;
+ g.setFont(f2);
+ g.drawString("MEDIUM FONT", 0, yPos, Graphics.LEFT | Graphics.TOP);
+ g.setColor(BLACK); 
+ yPos = yPos + f1.getHeight() + 10; 
+ g.setFont(f3);
+ g.drawString("SMALL FONT", 0, yPos, Graphics.LEFT | Graphics.TOP);
+ yPos = yPos + f1.getHeight() + 10; 
+ painting = false;
+ }
+ 
+} 
+} 
+
+2)InputChecking
+-------------------------------
+import javax.microedition.midlet.*;
+import javax.microedition.lcdui.*;
+
+public class InputChecking extends MIDlet implements CommandListener {
+    public Form form1;
+    public TextField textfield1;
+    public Command exitCommand;
+    public Command okCommand;
+    public StringItem st;
+    public Display display;
+
+    public InputChecking() {
+        display = Display.getDisplay(this);
+        form1 = new Form("Insert the Phone number");
+        exitCommand = new Command("Exit", Command.EXIT, 1);
+        okCommand = new Command("Ok", Command.OK, 1);
+        st = new StringItem("Phone Number is ", "");
+        textfield1 = new TextField("Phone;", "", 30, TextField.ANY);
+        form1.append(textfield1);
+        form1.addCommand(okCommand);
+        form1.addCommand(exitCommand);
+        form1.setCommandListener(this);
+    }
+
+    public void startApp() {
+        display.setCurrent(form1);
+    }
+
+    public void pauseApp() {
+    }
+
+    public void destroyApp(boolean unconditional) {
+    }
+
+    public void commandAction(Command cmd, Displayable displayable) {
+        if (cmd == exitCommand)
+            notifyDestroyed();
+        else if (cmd == okCommand) {
+            String s = textfield1.getString();
+            s = s.replace(' ', '.');
+            System.out.println("After replace :"+s);
+
+            int len = s.length();
+            int i = 0;
+            int c = 0;
+
+            String s1 = "";
+            while (i < len) {
+                if (s.charAt(i) == '.')
+                {
+                    if (c == 0) {
+                        if (s1.equals("040") || s1.equals("041") || s1.equals("050") || s1.equals("0400")
+                                || s1.equals("044")) {
+                            c++;
+                            s1 = "";
+                        }
+                    }
+                    if (c == 1) {
+                        if (s1.length() - 1 == 3) {
+                            c++;
+                            s1 = "";
+                        }
+                    }
+                }
+                s1 = s1 + s.charAt(i);
+                i++;
+            }
+            if (s1.length() - 1 == 3 || s1.length() - 1 == 4 || s1.length() - 1 == 5)
+                c++;
+            if (c == 3)
+                st.setText("OK");
+            else {
+                st.setText("wrong\n Phone Number Format is xxx xxxxxxx\nArea code must be 040|050|041|0400|044");
+            }
+            form1.append(st);
+        }
+    }
+}
+
+3)BarGraph
+----------------------
+import javax.microedition.midlet.*;
+import javax.microedition.lcdui.*;
+
+public class BarGraphMIDlet extends MIDlet implements CommandListener {
+    public Form form;
+    public Command exitCommand;
+    public Command OkCommand;
+    public Command backCommand;
+    public Displayable d;
+    public Display display;
+    public TextField textfield1;
+    public TextField textfield2;
+    public TextField textfield3;
+    public TextField textfield4;
+    public BarGraphMIDlet() {
+        display = Display.getDisplay(this);
+        form = new Form("BarGraph");
+        textfield1 = new TextField("Value1:-", "", 30, TextField.ANY);
+        textfield2 = new TextField("Value2:-", "", 30, TextField.ANY);
+        textfield3 = new TextField("Value3:-", "", 30, TextField.ANY);
+        textfield4 = new TextField("Value4:-", "", 30, TextField.ANY);
+        form.append(textfield1);
+        form.append(textfield2);
+        form.append(textfield3);
+        form.append(textfield4);
+        OkCommand = new Command("Ok", Command.OK, 1);
+        exitCommand = new Command("Exit", Command.EXIT, 1);
+        backCommand = new Command("Back", Command.BACK, 1);
+        form.addCommand(OkCommand);
+        form.addCommand(exitCommand);
+        form.setCommandListener(this);
+    }
+    public void startApp() {
+        display.setCurrent(form);
+    }
+    public void pauseApp() {
+    }
+    public void destroyApp(boolean unconditional) {
+    }
+    public void commandAction(Command command, Displayable displayable) {
+        if (displayable == form) {
+            if (command == OkCommand) {
+                int[] data = new int[4];
+                data[0] = Integer.parseInt(textfield1.getString());
+                data[1] = Integer.parseInt(textfield2.getString());
+                data[2] = Integer.parseInt(textfield3.getString());
+                data[3] = Integer.parseInt(textfield4.getString());
+                d = new BarCanvas(data);
+                d.addCommand(backCommand);
+                d.setCommandListener(this);
+                display.setCurrent(d);
+            } else if (command == exitCommand)
+                notifyDestroyed();
+        } else if (displayable == d) {
+            if (command == backCommand)
+                display.setCurrent(form);
+        }
+    }
+}
+class BarCanvas extends Canvas {
+    int[] data;
+    public int x;
+    public int y;
+    public int y1;
+    public int h;
+
+    public BarCanvas(int[] data) {
+        this.data = data;
+        x = 10;
+    }
+    public void paint(Graphics g) {
+        g.setColor(255, 255, 255);
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+        g.setColor(0, 125, 100);
+        int i = 0;
+        y1 = data[0];
+        h = 200;
+        while (i < data.length) {
+            y = data[i];
+            h = 200 + y1 -y;
+            g.fillRect(x, y, 25, h);
+            x += 30;
+            i++;
+        }
+    }
+}
+Andriod:
+HelloName
+-------------------------
+activity_main.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="252dp"
+        android:text="Button1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="108dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="156dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextTextPersonName2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="68dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Enter Name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+MainAtivity.java:
+
+package com.example.hello1;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+    Button bt;
+    TextView tv;
+    EditText et;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        bt=(Button)findViewById(R.id.button1);
+        tv=(TextView)findViewById(R.id.textView2);
+        et=(EditText)findViewById(R.id.editTextTextPersonName2);
+        bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String st=et.getText().toString();
+                tv.setText("Entered:"+st);
+            }
+        });
+
+    }
+}
+
+2)Linear and Relative
+---------------------------
+Linear Layout:
+
+activity_main.xml:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Button" />
+</LinearLayout>
+MainAtivity.java:
+
+package com.example.layout1;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
+
+Relative Layout:
+activity_main.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button1" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/button5"
+        android:text="Button2" />
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button5"
+        android:text="Button3" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button7"
+        android:layout_marginTop="60dp"
+        android:text="User :" />
+
+    <EditText
+        android:id="@+id/editTextTextPersonName2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button7"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/textView"
+        android:text="Enter name"/>
+
+    <Button
+        android:id="@+id/button8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView"
+        android:text="Submit" />
+
+
+
+</RelativeLayout>
+
+
+MainAtivity.java:
+
+
+package com.example.layout2;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
+Grid Layout:
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="4" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="6" />
+
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7" />
+
+    <Button
+        android:id="@+id/button8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="8" />
+
+    <Button
+        android:id="@+id/button9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="9" />
+</GridLayout>
+
+Table Layout
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+<TableRow>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="21dp"
+        tools:layout_editor_absoluteY="55dp" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="10dp"
+        tools:layout_editor_absoluteY="132dp" />
+</TableRow>
+    <TableRow>
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="103dp"
+        tools:layout_editor_absoluteY="219dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="284dp"
+        tools:layout_editor_absoluteY="265dp" />
+    </TableRow>
+</TableLayout>
+
+
+
+3)Temperature
+---------------------
+activity_main.xml:
+
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/tab"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/Temp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="159dp"
+        android:text="Temprature Convertor"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TableRow android:layout_marginTop="20dip">
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="Enter The Number:"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:layout_marginLeft="20dip">
+        </TextView>
+
+        <EditText
+            android:id="@+id/txtNumber"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1">
+        </EditText>
+
+    </TableRow>
+
+
+    <TableRow android:layout_marginTop="20dip">
+
+        <TextView
+            android:text="Result :"
+            android:layout_width="wrap_content"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"> </TextView>
+
+        <TextView
+            android:id="@+id/txtResult"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip"
+            android:layout_weight="1">
+
+        </TextView>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_marginTop="20dip"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnFahrenheit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_span="1"
+
+            android:clickable="true"
+            android:text="Fahrenheit"
+            android:textColor="#E91E63"
+            android:onClick="ConverToFahrenheit"/>
+
+        <Button
+            android:id="@+id/btnCelsius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Celsius"
+            android:textColor="#9C27B0"
+            android:onClick="ConverToCelsius"/>
+
+    </TableRow>
+
+    <TableRow android:layout_marginTop="20dip">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"
+            android:text="Temparature is :"
+            android:textColor="#000000"
+            android:textSize="20sp"></TextView>
+
+        <TextView
+            android:id="@+id/txtResult1"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dip"
+            android:layout_marginRight="20dip"
+            android:layout_weight="1">
+
+        </TextView>
+
+    </TableRow>
+
+
+</TableLayout>
+MainAtivity.java:
+package com.example.temparature;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TableLayout;
+import android.widget.TextView;
+
+public class MainActivity extends Activity {
+    EditText num;
+    TextView result,result1;
+    double c,f;
+    TableLayout tab;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        num=(EditText)findViewById(R.id.txtNumber);
+        result=(TextView)findViewById(R.id.txtResult);
+        result1 = (TextView)findViewById(R.id.txtResult1);
+        tab=(TableLayout)findViewById(R.id.tab);
+        tab.setBackgroundColor(Color.CYAN);
+    }
+
+    public void ConverToFahrenheit(View v)
+    {
+        c=Double.parseDouble(String.valueOf(num.getText()));
+        String res=String.valueOf((c*9)/5+32);
+        result.setText(res);
+        result1.setText(res);
+    }
+    public void ConverToCelsius(View v)
+    {
+        f=Double.parseDouble(String.valueOf(num.getText()));
+        String res=String.valueOf((f-32)*5/9);
+        result.setText(res);
+        result1.setText(res);
+    }
+}
+
+
